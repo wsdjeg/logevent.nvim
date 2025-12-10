@@ -24,7 +24,7 @@ function M.start(fargs)
 	if #events > 0 then
 		id = vim.api.nvim_create_autocmd(events, {
 			callback = vim.schedule_wrap(function(event)
-				log.debug(event.event .. vim.inspect(event))
+				log.debug(event.event .. '\n' .. vim.inspect(event))
 			end),
 			group = group,
 		})
