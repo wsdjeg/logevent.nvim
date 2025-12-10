@@ -1,29 +1,38 @@
 local M = {}
 
-function M.setup()
-	local log = require("logger").derive("logevent")
-	local id
-	vim.api.nvim_create_user_command("LogEvent", function(opt)
-		if not id then
-			local group = vim.api.nvim_create_augroup("logevent", { clear = true })
-			id = vim.api.nvim_create_autocmd(
-				vim.tbl_filter(function(e)
-					return not vim.endswith(e, "Cmd")
-				end, vim.fn.getcompletion("", "event")),
-				{
-					callback = vim.schedule_wrap(function(event)
-						if event.event ~= "SafeState" then
-							log.debug(event.event .. event.buf)
-						end
-					end),
-					group = group,
-				}
-			)
-		else
-			vim.api.nvim_create_augroup("logevent", { clear = true })
-			id = nil
+local log = require("logger").derive("logevent")
+local id
+local group = vim.api.nvim_create_augroup("logevent", { clear = true })
+function M.start(opt)
+	M.stop()
+	local events = {}
+	if #opt.fargs == 0 then
+		events = vim.tbl_filter(function(e)
+			return e ~= "SafeState"
+		end, vim.fn.getcompletion("", "event"))
+	else
+		local e = {}
+		for _, v in ipairs(opt.fargs) do
+			for _, ev in ipairs(vim.fn.getcompletion(v, "event")) do
+				e[ev] = true
+			end
 		end
-	end, { nargs = "*" })
+		for ev, _ in pairs(e) do
+			table.insert(events, ev)
+		end
+	end
+	if #events > 0 then
+		id = vim.api.nvim_create_autocmd(events, {
+			callback = vim.schedule_wrap(function(event)
+				log.debug(event.event .. vim.inspect(event))
+			end),
+			group = group,
+		})
+	end
+end
+
+function M.stop()
+	pcall(vim.api.nvim_del_autocmd, id)
 end
 
 return M
