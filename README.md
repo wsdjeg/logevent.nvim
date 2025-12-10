@@ -39,5 +39,19 @@ luarocks install logevent.nvim
 
 1. use `:LogEvent` to start logevent.
 2. do something.
-3. use `:LogEnent stop` to stop logevent 
+3. use `:LogEnent stop` to stop logevent
 4. checkout the event logs in logger buffer.
+
+log all buffer relative evens:
+
+```
+:LogEvent buf
+```
+
+log all buf and windows events.
+
+```
+:LogEvent buf win
+```
+
+logevent.nvim get the events list via `getcompletion(argv, 'event')`
