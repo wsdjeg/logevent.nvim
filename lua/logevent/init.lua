@@ -3,16 +3,16 @@ local M = {}
 local log = require("logger").derive("logevent")
 local id
 local group = vim.api.nvim_create_augroup("logevent", { clear = true })
-function M.start(opt)
+function M.start(fargs)
 	M.stop()
 	local events = {}
-	if #opt.fargs == 0 then
+	if #fargs == 0 then
 		events = vim.tbl_filter(function(e)
 			return e ~= "SafeState"
 		end, vim.fn.getcompletion("", "event"))
 	else
 		local e = {}
-		for _, v in ipairs(opt.fargs) do
+		for _, v in ipairs(fargs) do
 			for _, ev in ipairs(vim.fn.getcompletion(v, "event")) do
 				e[ev] = true
 			end
