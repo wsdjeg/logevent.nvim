@@ -6,4 +6,11 @@ vim.api.nvim_create_user_command("LogEvent", function(opt)
     end
 end, {
 	nargs = "*",
+    complete = function(arglead)
+        if vim.startswith('stop', arglead) then
+            return {'stop'}
+        else
+            return vim.fn.getcompletion(arglead, 'event')
+        end
+    end
 })
